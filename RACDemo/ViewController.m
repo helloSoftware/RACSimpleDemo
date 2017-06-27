@@ -39,18 +39,18 @@
     _clickView.backgroundColor = [UIColor greenColor];
     
     @weakify(self)
-    _clickView.btnClickBlock = ^(NSString *title) {
-        @strongify(self)
-
-        ViewController *vc = [[ViewController alloc] init];
-        vc.view.backgroundColor = [UIColor whiteColor];
-        vc.title = title;
-        vc.clickView.btnClickBlock = ^(NSString *title) {
-            self.title = title;
-            [self.navigationController popViewControllerAnimated:YES];
-        };
-        [self.navigationController pushViewController:vc animated:YES];
-    };
+//    _clickView.btnClickBlock = ^(NSString *title) {
+//        @strongify(self)
+//
+//        ViewController *vc = [[ViewController alloc] init];
+//        vc.view.backgroundColor = [UIColor whiteColor];
+//        vc.title = title;
+//        vc.clickView.btnClickBlock = ^(NSString *title) {
+//            self.title = title;
+//            [self.navigationController popViewControllerAnimated:YES];
+//        };
+//        [self.navigationController pushViewController:vc animated:YES];
+//    };
     [self.view addSubview:_clickView];
 
     [_clickView btnClick:@"hello,complete" complete:^(NSString *data) {
@@ -87,8 +87,6 @@
     
     NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
     parameters[@"q"] = @"英语";
-
-    [command execute:parameters];
     
     [command.executing subscribeNext:^(NSNumber * _Nullable x) {
         
@@ -108,6 +106,9 @@
         }
     }];
 
+    _clickView.btnClickBlock = ^(NSString *title) {
+        [command execute:parameters];
+    };
     _clickView.btn.rac_command = command;
 
 }
