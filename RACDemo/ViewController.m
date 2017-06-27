@@ -44,10 +44,12 @@
 
 //    [self signal解析];
 //    [self racSubject];
+    [self racBehaviorSubject];
+//    [self racReplaySubject];
 //    [self command];
 //    [self target];
 //    [self selector];
-    [self kvo];
+//    [self kvo];
 }
 
 - (void)command{
@@ -86,16 +88,74 @@
     //1创建信号
     RACSubject *subject = [RACSubject subject];
     //2.订阅信号
-    [subject subscribeNext:^(id  _Nullable x) {
-        NSLog(@"接收到信号 %@",x);
+    [[subject takeLast:2] subscribeNext:^(id  _Nullable x) {
+        NSLog(@"111接收到信号 %@",x);
     }];
+    
+    //3.发送数据
+    [subject sendNext:@1];
+    [subject sendNext:@11];
+    [subject sendNext:@111];
+    [subject sendNext:@1111];
+
+    
     [subject subscribeNext:^(id  _Nullable x) {
-        NSLog(@"接收到信号 %@",x);
+        NSLog(@"222接收到信号 %@",x);
     }];
 
     //3.发送数据
+    [subject sendNext:@2];
+    [subject sendCompleted];
+}
+
+- (void)racBehaviorSubject{
+
+    RACBehaviorSubject *subject = [RACBehaviorSubject subject];
+    
+    [subject sendNext:@100];
+    [subject sendNext:@101];
+    [subject sendNext:@102];
+    [subject sendNext:@103];
+
+    //2.订阅信号
+    [subject subscribeNext:^(id  _Nullable x) {
+        NSLog(@"111接收到信号 %@",x);
+    }];
+    
+    //3.发送数据
+    [subject sendNext:@1];
+   
+    [subject subscribeNext:^(id  _Nullable x) {
+        NSLog(@"222接收到信号 %@",x);
+    }];
+    
+    //3.发送数据
+    [subject sendNext:@2];
+    [subject sendNext:@210];
+    [subject sendNext:@211];
+
+    [subject sendCompleted];
+}
+
+- (void)racReplaySubject{
+
+    RACReplaySubject *subject = [RACReplaySubject subject];
+    //2.订阅信号
+    [subject subscribeNext:^(id  _Nullable x) {
+        NSLog(@"111接收到信号 %@",x);
+    }];
+    
+    //3.发送数据
     [subject sendNext:@1];
     
+    
+    [subject subscribeNext:^(id  _Nullable x) {
+        NSLog(@"222接收到信号 %@",x);
+    }];
+    
+    //3.发送数据
+    [subject sendNext:@2];
+
 }
 
 - (void)signal解析{
@@ -106,7 +166,12 @@
         
         NSLog(@"send signal");
         //发送信号
-        [subscriber sendNext:@"hello signal"];
+        [subscriber sendNext:@"hello signal one"];
+        [subscriber sendNext:@"hello signal two"];
+        [subscriber sendNext:@"hello signal three"];
+        [subscriber sendNext:@"hello signal four"];
+        [subscriber sendCompleted];
+
 //        return nil;
         return [RACDisposable disposableWithBlock:^{
             //清空资源用 资源释放 subscriber释放才会调用
@@ -115,10 +180,14 @@
     }];
     //热信号
     //订阅信号
-    RACDisposable *dis = [signal subscribeNext:^(id  _Nullable x) {
+    RACDisposable *dis = [[signal takeLast:2] subscribeNext:^(id  _Nullable x) {
         NSLog(@"subcribe signal");
         //x 信号发送内容
         NSLog(@"%@",x);
+    } error:^(NSError * _Nullable error) {
+        NSLog(@"errpr");
+    } completed:^{
+        NSLog(@"complete");
     }];
 
     //取消订阅
@@ -179,6 +248,7 @@
 
 - (void)more{
 
+    //btn的enabled属性的值 由 tf1 & tf2 的值的长度是否都大于0共同决定
     RAC(self.btn,enabled) = [RACSignal combineLatest:@[_tf1.rac_textSignal,_tf2.rac_textSignal] reduce:^id _Nullable(NSString *name,NSString *pwd){
        
         return @(name.length && pwd.length);
@@ -244,8 +314,6 @@
         @strongify(self)
         self.lab.text = @"hello";
         }];
-    
-
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
