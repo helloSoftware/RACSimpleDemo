@@ -17,9 +17,6 @@
 #import <NSObject+RACKVOWrapper.h>
 
 @interface ViewController ()
-{
-    clickView *_view;
-}
 @property(nonatomic , strong) Person *person;
 @property (weak, nonatomic) IBOutlet UILabel *lab;
 @property (weak, nonatomic) IBOutlet UIButton *btn;
@@ -37,14 +34,34 @@
     self.person.name = @"hello";
     
     
-    _view = [[[NSBundle mainBundle] loadNibNamed:@"clickView" owner:self options:nil] lastObject];
-    _view.frame = CGRectMake(10, 50, 300, 100);
-    _view.backgroundColor = [UIColor greenColor];
-    [self.view addSubview:_view];
+    _clickView = [[[NSBundle mainBundle] loadNibNamed:@"clickView" owner:self options:nil] lastObject];
+    _clickView.frame = CGRectMake(10, 50, 300, 100);
+    _clickView.backgroundColor = [UIColor greenColor];
+    
+    @weakify(self)
+    _clickView.btnClickBlock = ^(NSString *title) {
+        @strongify(self)
 
+        ViewController *vc = [[ViewController alloc] init];
+        vc.view.backgroundColor = [UIColor whiteColor];
+        vc.title = title;
+        vc.clickView.btnClickBlock = ^(NSString *title) {
+            self.title = title;
+            [self.navigationController popViewControllerAnimated:YES];
+        };
+        [self.navigationController pushViewController:vc animated:YES];
+    };
+    [self.view addSubview:_clickView];
+
+    [_clickView btnClick:@"hello,complete" complete:^(NSString *data) {
+        NSLog(@"%@",data);
+    }];
+    
+    _clickView.click(@"click").show(@"show");
+    
 //    [self signal解析];
 //    [self racSubject];
-    [self racBehaviorSubject];
+//    [self racBehaviorSubject];
 //    [self racReplaySubject];
 //    [self command];
 //    [self target];
@@ -213,7 +230,7 @@
 //        NSLog(@"%@",x);
 //    }];
     
-    [[_view rac_valuesAndChangesForKeyPath:@"frame" options:NSKeyValueObservingOptionNew observer:nil] subscribeNext:^(RACTwoTuple<id,NSDictionary *> * _Nullable x) {
+    [[_clickView rac_valuesAndChangesForKeyPath:@"frame" options:NSKeyValueObservingOptionNew observer:nil] subscribeNext:^(RACTwoTuple<id,NSDictionary *> * _Nullable x) {
         NSLog(@"%@",x);
     }];
 }
@@ -222,7 +239,7 @@
 
     //监听方法
         //函数式编程
-    [_view rac_observeKeyPath:@"frame" options:NSKeyValueObservingOptionOld|NSKeyValueObservingOptionNew observer:nil block:^(id value, NSDictionary *change, BOOL causedByDealloc, BOOL affectedOnlyLastComponent) {
+    [_clickView rac_observeKeyPath:@"frame" options:NSKeyValueObservingOptionOld|NSKeyValueObservingOptionNew observer:nil block:^(id value, NSDictionary *change, BOOL causedByDealloc, BOOL affectedOnlyLastComponent) {
         NSLog(@"change = %@",change);
     }];
 }

@@ -7,10 +7,15 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "clickView.h"
+
+typedef void(^TitleBlock)(NSString *title);
 
 @interface ViewController : UIViewController
 
+@property(nonatomic, copy) TitleBlock titleBlock;
 
+@property(nonatomic, strong) clickView *clickView;
 
 @end
 
