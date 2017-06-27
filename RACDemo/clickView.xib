@@ -28,6 +28,9 @@
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <nil key="simulatedTopBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="btn" destination="liQ-3T-D9Y" id="NmH-Id-219"/>
+            </connections>
             <point key="canvasLocation" x="148" y="110"/>
         </view>
     </objects>

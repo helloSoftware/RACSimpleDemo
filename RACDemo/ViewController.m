@@ -24,7 +24,7 @@
 @property (weak, nonatomic) IBOutlet UITextField *tf2;
 
 @end
-
+//响应式
 @implementation ViewController
 
 - (void)viewDidLoad {
@@ -38,25 +38,25 @@
     _clickView.frame = CGRectMake(10, 50, 300, 100);
     _clickView.backgroundColor = [UIColor greenColor];
     
-//    @weakify(self)
-//    _clickView.btnClickBlock = ^(NSString *title) {
-//        @strongify(self)
+    @weakify(self)
+    _clickView.btnClickBlock = ^(NSString *title) {
+        @strongify(self)
+
+        ViewController *vc = [[ViewController alloc] init];
+        vc.view.backgroundColor = [UIColor whiteColor];
+        vc.title = title;
+        vc.clickView.btnClickBlock = ^(NSString *title) {
+            self.title = title;
+            [self.navigationController popViewControllerAnimated:YES];
+        };
+        [self.navigationController pushViewController:vc animated:YES];
+    };
+    [self.view addSubview:_clickView];
+
+    [_clickView btnClick:@"hello,complete" complete:^(NSString *data) {
+        NSLog(@"%@",data);
+    }];
 //
-//        ViewController *vc = [[ViewController alloc] init];
-//        vc.view.backgroundColor = [UIColor whiteColor];
-//        vc.title = title;
-//        vc.clickView.btnClickBlock = ^(NSString *title) {
-//            self.title = title;
-//            [self.navigationController popViewControllerAnimated:YES];
-//        };
-//        [self.navigationController pushViewController:vc animated:YES];
-//    };
-//    [self.view addSubview:_clickView];
-//
-//    [_clickView btnClick:@"hello,complete" complete:^(NSString *data) {
-//        NSLog(@"%@",data);
-//    }];
-//    
 //    _clickView.click(@"click").show(@"show");
     
 //    [self signal解析];
@@ -67,7 +67,7 @@
 //    [self target];
 //    [self selector];
 //    [self kvo];
-    
+//    [self net];
     [self net2];
 }
 
@@ -92,11 +92,23 @@
     
     [command.executing subscribeNext:^(NSNumber * _Nullable x) {
         
+        static int first = 0;
+        
         if (x.boolValue == YES) {
             NSLog(@"请求中...");
+        }else{
+            if (!first) {
+                NSLog(@"请求开始");
+            }else{
+                NSLog(@"请求结束");
+            }
+            
+            first++;
+            
         }
     }];
 
+    _clickView.btn.rac_command = command;
 
 }
 

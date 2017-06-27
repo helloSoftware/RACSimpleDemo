@@ -18,6 +18,7 @@ typedef clickView*(^ShowBlock)(NSString *string);
 
 @interface clickView : UIView
 
+@property (weak, nonatomic) IBOutlet UIButton *btn;
 @property(nonatomic, copy) NSString *name;
 
 @property(nonatomic, copy) BtnClickBlock btnClickBlock;

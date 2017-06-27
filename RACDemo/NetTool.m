@@ -51,7 +51,7 @@
     RACCommand *command = [[RACCommand alloc] initWithSignalBlock:^RACSignal * _Nonnull(id  _Nullable input) {
         NSLog(@"要请求啦");
 
-        RACSignal *signal = [RACSignal createSignal:^RACDisposable * _Nullable(id<RACSubscriber>  _Nonnull subscriber) {
+        RACSignal *signal = [[RACSignal createSignal:^RACDisposable * _Nullable(id<RACSubscriber>  _Nonnull subscriber) {
             [self GET:url parameters:input progress:^(NSProgress * _Nonnull downloadProgress) {
                 NSLog(@"\n downProgress = %@",downloadProgress);
             } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
@@ -60,14 +60,16 @@
                 
                 ////========发送信号
                 [subscriber sendNext:response];
+                [subscriber sendCompleted];
                 
             } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
                 NSLog(@"\n error = %@",error);
             }];
             
             return nil;
-        }];
+        }] delay:3];
         
+
         return signal;
     }];
     return command;
