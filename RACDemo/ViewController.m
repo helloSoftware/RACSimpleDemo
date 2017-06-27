@@ -38,26 +38,26 @@
     _clickView.frame = CGRectMake(10, 50, 300, 100);
     _clickView.backgroundColor = [UIColor greenColor];
     
-    @weakify(self)
-    _clickView.btnClickBlock = ^(NSString *title) {
-        @strongify(self)
-
-        ViewController *vc = [[ViewController alloc] init];
-        vc.view.backgroundColor = [UIColor whiteColor];
-        vc.title = title;
-        vc.clickView.btnClickBlock = ^(NSString *title) {
-            self.title = title;
-            [self.navigationController popViewControllerAnimated:YES];
-        };
-        [self.navigationController pushViewController:vc animated:YES];
-    };
-    [self.view addSubview:_clickView];
-
-    [_clickView btnClick:@"hello,complete" complete:^(NSString *data) {
-        NSLog(@"%@",data);
-    }];
-    
-    _clickView.click(@"click").show(@"show");
+//    @weakify(self)
+//    _clickView.btnClickBlock = ^(NSString *title) {
+//        @strongify(self)
+//
+//        ViewController *vc = [[ViewController alloc] init];
+//        vc.view.backgroundColor = [UIColor whiteColor];
+//        vc.title = title;
+//        vc.clickView.btnClickBlock = ^(NSString *title) {
+//            self.title = title;
+//            [self.navigationController popViewControllerAnimated:YES];
+//        };
+//        [self.navigationController pushViewController:vc animated:YES];
+//    };
+//    [self.view addSubview:_clickView];
+//
+//    [_clickView btnClick:@"hello,complete" complete:^(NSString *data) {
+//        NSLog(@"%@",data);
+//    }];
+//    
+//    _clickView.click(@"click").show(@"show");
     
 //    [self signal解析];
 //    [self racSubject];
@@ -67,6 +67,37 @@
 //    [self target];
 //    [self selector];
 //    [self kvo];
+    
+    [self net2];
+}
+
+- (void)net2{
+
+    NetTool *tool = [NetTool shareTool];
+    NSString *url1 = @"https://api.douban.com/v2/book/search";
+    NSString *url2 = @"https://baidu.com";
+    RACCommand *command = [tool getDataWithUrl:url1];
+    
+    //接收到结果
+    [command.executionSignals.switchToLatest subscribeNext:^(id  _Nullable x) {
+        
+        NSLog(@"数据来啦 来啦 来啦 %@",x);
+        
+    }];
+    
+    NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
+    parameters[@"q"] = @"英语";
+
+    [command execute:parameters];
+    
+    [command.executing subscribeNext:^(NSNumber * _Nullable x) {
+        
+        if (x.boolValue == YES) {
+            NSLog(@"请求中...");
+        }
+    }];
+
+
 }
 
 - (void)command{

@@ -16,4 +16,6 @@
 
 - (RACSignal *)getWithURL:(NSString *)url parameters:(NSDictionary *)parameters;
 
+- (RACCommand *)getDataWithUrl:(NSString *)url;
+
 @end
